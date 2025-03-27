@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
 project(torchtest)
 set(CMAKE_CXX_STANDARD 17)
@@ -40,12 +40,39 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 set(CMAKE_PREFIX_PATH ${PREV_CMAKE_PREFIX_PATH})
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main.cpp)
 
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${TORCH_LIBRARIES})
 
 
+set(TORCH_BRIDGE_TARGETS ${PROJECT_SOURCE_DIR}/bridge.cpp)
+set(TORCH_BRIDGE_INCLUDES ${PROJECT_SOURCE_DIR}/bridge.h)
 
+# Add source files
+add_library(torchbridge STATIC ${TORCH_BRIDGE_TARGETS})
+
+# Add include directories
+target_include_directories(torchbridge PUBLIC ${TORCH_BRIDGE_INCLUDES})
+
+# Add dependencies
+target_link_libraries(torchbridge ${TORCH_LIBRARIES})
+
+
+install(
+    TARGETS torchbridge 
+    EXPORT TORCH_BRIDGE_TARGETS
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    PUBLIC_HEADER DESTINATION include # No idea what this does
+    )
+
+# install(EXPORT torchbridge_targets
+#     FILE torchbridge_config.cmake
+#     NAMESPACE torchbridge::
+#     DESTINATION lib/cmake/torchbridge
+#     )
+
+install(DIRECTORY include/ DESTINATION include)
 
 #
 # target_include_directories(${PROJECT_NAME} PRIVATE ${TORCH_INCLUDE_DIRS})
