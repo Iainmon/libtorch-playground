@@ -1,7 +1,9 @@
 #ifndef BRIDGE_H
 #define BRIDGE_H
+#include <torch/torch.h>
+#include <stdio.h>
 
-
-static int baz(void);
+int baz(void);
 
 #endif // BRIDGE_H
+//hello
