@@ -1,6 +1,7 @@
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
-int baz();
+
+static int baz(void);
 
 #endif // BRIDGE_H

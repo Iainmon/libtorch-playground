@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
+set(CMAKE_C_COMPILER "clang")
+set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_CXX_STANDARD 17)
 
 project(torchtest)
-set(CMAKE_CXX_STANDARD 17)
 
 set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(PROJECT_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 set(PROJECT_SOURCE_DIR ${PROJECT_ROOT_DIR}/src)
+set(PROJECT_LIBRARY_DIR ${PROJECT_ROOT_DIR}/lib)
 set(PROJECT_INCLUDE_DIR ${PROJECT_ROOT_DIR}/include)
 
 if(UNIX AND NOT APPLE)
@@ -22,48 +25,60 @@ if(LINUX)
 endif()
 
 include(FetchContent)
-
 FetchContent_Declare(
     libtorch
     URL ${TORCH_DISTRIBUTION}
-)
-
+    )
 FetchContent_GetProperties(libtorch)
 if(NOT libtorch_POPULATED)
     FetchContent_MakeAvailable(libtorch)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${libtorch_SOURCE_DIR}/share/cmake)
+include_directories(${TORCH_INCLUDE_DIRS})
 
-set(PREV_CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
-set(CMAKE_PREFIX_PATH ${libtorch_SOURCE_DIR})
+# TORCH_CXX_FLAGS
+# set(PREV_CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
+# set(CMAKE_PREFIX_PATH ${libtorch_SOURCE_DIR})
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-set(CMAKE_PREFIX_PATH ${PREV_CMAKE_PREFIX_PATH})
+# set(CMAKE_PREFIX_PATH ${PREV_CMAKE_PREFIX_PATH})
 
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${TORCH_LIBRARIES})
 
 
-set(TORCH_BRIDGE_TARGETS ${PROJECT_SOURCE_DIR}/bridge.cpp)
-set(TORCH_BRIDGE_INCLUDES ${PROJECT_SOURCE_DIR}/bridge.h)
+# set(TORCH_BRIDGE_TARGETS ${PROJECT_SOURCE_DIR})
+# set(TORCH_BRIDGE_INCLUDES ${PROJECT_SOURCE_DIR})
+file(GLOB_RECURSE TORCH_BRIDGE_TARGETS "${PROJECT_LIBRARY_DIR}/*.cpp")
+file(GLOB_RECURSE TORCH_BRIDGE_INCLUDES "${PROJECT_INCLUDE_DIR}/*.h")
+
+include_directories(${PROJECT_INCLUDE_DIR})
+include_directories(${PROJECT_LIBRARY_DIR})
 
 # Add source files
 add_library(torchbridge STATIC ${TORCH_BRIDGE_TARGETS})
+target_sources(torchbridge INTERFACE ${TORCH_BRIDGE_INCLUDES})
+target_link_libraries(torchbridge STATIC ${TORCH_LIBRARIES})
 
 # Add include directories
-target_include_directories(torchbridge PUBLIC ${TORCH_BRIDGE_INCLUDES})
+# target_include_directories(torchbridge PUBLIC ${TORCH_BRIDGE_INCLUDES} )
 
 # Add dependencies
-target_link_libraries(torchbridge ${TORCH_LIBRARIES})
+# target_link_libraries(torchbridge ${TORCH_LIBRARIES})
 
+# set_target_properties(torchbridge PROPERTIES PUBLIC_HEADER ${TORCH_BRIDGE_INCLUDES})
+
+include(GNUInstallDirs)
 
 install(
     TARGETS torchbridge 
-    EXPORT TORCH_BRIDGE_TARGETS
+    EXPORT torchbridge_targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include # No idea what this does
+    # FILE_SET include
     )
 
 # install(EXPORT torchbridge_targets
@@ -72,7 +87,7 @@ install(
 #     DESTINATION lib/cmake/torchbridge
 #     )
 
-install(DIRECTORY include/ DESTINATION include)
+# install(DIRECTORY include/ DESTINATION include)
 
 #
 # target_include_directories(${PROJECT_NAME} PRIVATE ${TORCH_INCLUDE_DIRS})
