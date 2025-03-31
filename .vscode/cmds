@@ -1,20 +1,14 @@
 [
 {
   "directory": "/Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build",
-  "command": "/usr/bin/clang++ -DUSE_C10D_GLOO -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -I/Users/iainmoncrief/Documents/Github/libtorch-playground/include -I/Users/iainmoncrief/Documents/Github/libtorch-playground/lib -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build/_deps/libtorch-src/include -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build/_deps/libtorch-src/include/torch/csrc/api/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/torchtest.dir/src/main.cpp.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/src/main.cpp",
-  "file": "/Users/iainmoncrief/Documents/Github/libtorch-playground/src/main.cpp",
-  "output": "CMakeFiles/torchtest.dir/src/main.cpp.o"
+  "command": "/usr/bin/clang++ -DUSE_C10D_GLOO -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/libtorch/include -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/libtorch/include/torch/csrc/api/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Tester.dir/src/tester.cpp.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/src/tester.cpp",
+  "file": "/Users/iainmoncrief/Documents/Github/libtorch-playground/src/tester.cpp",
+  "output": "CMakeFiles/Tester.dir/src/tester.cpp.o"
 },
 {
   "directory": "/Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build",
-  "command": "/usr/bin/clang++ -DUSE_C10D_GLOO -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -I/Users/iainmoncrief/Documents/Github/libtorch-playground/include -I/Users/iainmoncrief/Documents/Github/libtorch-playground/lib -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build/_deps/libtorch-src/include -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build/_deps/libtorch-src/include/torch/csrc/api/include -g -std=c++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/torchbridge.dir/lib/bridge.cpp.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/lib/bridge.cpp",
-  "file": "/Users/iainmoncrief/Documents/Github/libtorch-playground/lib/bridge.cpp",
-  "output": "CMakeFiles/torchbridge.dir/lib/bridge.cpp.o"
-},
-{
-  "directory": "/Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build",
-  "command": "/usr/bin/clang  -I/Users/iainmoncrief/Documents/Github/libtorch-playground/include -I/Users/iainmoncrief/Documents/Github/libtorch-playground/lib -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/mylib.dir/lib/mylib.c.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/lib/mylib.c",
-  "file": "/Users/iainmoncrief/Documents/Github/libtorch-playground/lib/mylib.c",
-  "output": "CMakeFiles/mylib.dir/lib/mylib.c.o"
+  "command": "/usr/bin/clang++ -DUSE_C10D_GLOO -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/libtorch/include -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/libtorch/include/torch/csrc/api/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Tester2.dir/src/tester.cpp.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/src/tester.cpp",
+  "file": "/Users/iainmoncrief/Documents/Github/libtorch-playground/src/tester.cpp",
+  "output": "CMakeFiles/Tester2.dir/src/tester.cpp.o"
 }
 ]

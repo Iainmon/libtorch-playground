@@ -11,7 +11,7 @@ set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 17)
 
 
-set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
+set(PROJECT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(PROJECT_BINARY_DIR ${CMAKE_BINARY_DIR})
 set(PROJECT_CACHE_DIR "${PROJECT_ROOT_DIR}/.cache")
 set(PROJECT_SOURCE_DIR "${PROJECT_ROOT_DIR}/src")
@@ -32,27 +32,43 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chapel")
 
 include(dlcache)
-include(LibTorchDL)
 find_package(chpl REQUIRED HINTS ${CMAKE_MODULE_PATH})
+
 
 project(torchtest LANGUAGES CXX C CHPL)
 
 
-
-# if(APPLE)
-#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-arm64-latest.zip")
-# endif()
-
-# if(LINUX)
-#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-static-with-deps-latest.zip")
-# endif()
+set(LIBTORCH_DIR ${PROJECT_ROOT_DIR}/libtorch)
+set(LIBTORCH_LIBRARY_DIR ${LIBTORCH_DIR}/lib)
+set(LIBTORCH_INCLUDE_DIR ${LIBTORCH_DIR}/include)
+file(GLOB LIBTORCH_LIBRARIES ${LIBTORCH_LIBRARY_DIR}/*)
+file(GLOB_RECURSE LIBTORCH_INCLUDES ${LIBTORCH_INCLUDE_DIR}/*)
 
 
+include(LibTorchDL)
+download_libtorch(
+    CACHE_DIR ${PROJECT_CACHE_DIR}
+    DESTINATION ${LIBTORCH_DIR}
+)
+
+set(CMAKE_PREFIX_PATH ${LIBTORCH_DIR})
+find_package(Torch REQUIRED)
+find_package(ATen REQUIRED)
 
 
-
+add_executable(Tester src/tester.cpp)
+target_link_libraries(Tester ${TORCH_LIBRARIES})
 
 add_executable(Milk src/Milk.chpl)
+
+# add_library(libtorch STATIC IMPORTED)
+# # set_target_properties(libtorch PROPERTIES IMPORTED_LOCATION "${LIBTORCH_LIBRARY_DIR}/libtorch.dylib")
+# target_link_libraries(libtorch INTERFACE ${TORCH_LIBRARIES})
+# target_include_directories(libtorch INTERFACE ${LIBTORCH_INCLUDE_DIR})
+
+add_executable(Tester2 src/tester.cpp)
+target_link_libraries(Tester2 torch)
+
 # target_include_directories(Milk PRIVATE ${PROJECT_INCLUDE_DIR})
 # target_link_libraries(Aloha PRIVATE mylib)
 
@@ -71,11 +87,8 @@ add_executable(Milk src/Milk.chpl)
 
 
 
-download_libtorch(
-    CACHE_DIR ${PROJECT_CACHE_DIR}
-    DESTINATION "${PROJECT_ROOT_DIR}/libtorch"
-)
 
+if(FALSE)
 
 set(TORCH_DISTRIBUTION "${PROJECT_ROOT_DIR}/.cache/libtorch_cache.zip")
 
@@ -319,3 +332,4 @@ add_custom_target(
 # target_link_libraries(${PROJECT_NAME} "${TORCH_LIBRARIES}")
 
 # set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+endif()
