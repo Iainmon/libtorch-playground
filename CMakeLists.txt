@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
+include(CMakePrintHelpers)
+
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
 
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
@@ -8,28 +13,43 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(PROJECT_BINARY_DIR ${CMAKE_BINARY_DIR})
+set(PROJECT_SOURCE_DIR ${PROJECT_ROOT_DIR}/src)
+set(PROJECT_LIBRARY_DIR ${PROJECT_ROOT_DIR}/lib)
+set(PROJECT_INCLUDE_DIR ${PROJECT_ROOT_DIR}/include)
+
+set(PROJECT_CMAKE_MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+cmake_print_variables(PROJECT_ROOT_DIR)
+cmake_print_variables(PROJECT_BINARY_DIR)
+cmake_print_variables(PROJECT_SOURCE_DIR)
+cmake_print_variables(PROJECT_LIBRARY_DIR)
+cmake_print_variables(PROJECT_INCLUDE_DIR)
+
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chapel")
 
 include(dlcache)
-include(CMakePrintHelpers)
+include(LibTorchDL)
+download_libtorch()
 find_package(chpl REQUIRED HINTS ${CMAKE_MODULE_PATH})
-
-
-
-cmake_print_variables(PROJECT_ROOT_DIR)
-cmake_print_variables(PROJECT_BINARY_DIR)
-cmake_print_variables(PROJECT_SOURCE_DIR)
-# find_package(chpl REQUIRED HINTS ${PROJECT_ROOT_DIR}/cmake/chapel)
-
 
 project(torchtest LANGUAGES CXX C CHPL)
 
-set(PROJECT_SOURCE_DIR ${PROJECT_ROOT_DIR}/src)
-set(PROJECT_LIBRARY_DIR ${PROJECT_ROOT_DIR}/lib)
-set(PROJECT_INCLUDE_DIR ${PROJECT_ROOT_DIR}/include)
+
+
+# if(APPLE)
+#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-arm64-latest.zip")
+# endif()
+
+# if(LINUX)
+#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-static-with-deps-latest.zip")
+# endif()
+
+
+
+
 
 
 add_executable(Milk src/Milk.chpl)
@@ -50,17 +70,15 @@ add_executable(Milk src/Milk.chpl)
 
 
 
-if(UNIX AND NOT APPLE)
-    set(LINUX TRUE)
-endif()
 
-if(APPLE)
-    set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-arm64-latest.zip")
-endif()
 
-if(LINUX)
-    set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-static-with-deps-latest.zip")
-endif()
+# if(APPLE)
+#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-arm64-latest.zip")
+# endif()
+
+# if(LINUX)
+#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-static-with-deps-latest.zip")
+# endif()
 
 include(FetchContent)
 FetchContent_Declare(
@@ -107,7 +125,7 @@ cmake_print_variables(TORCH_CXX_FLAGS)
 # find_library(TORCH_LIBRARIES NAMES torch PATHS ${libtorch_SOURCE_DIR}/lib)
 
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main.cpp)
+add_executable(${PROJECT_NAME} ${PROJECT_ROOT_DIR}/src/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${TORCH_LIBRARIES})
 # target_link_libraries(${PROJECT_NAME} STATIC torch)
 
