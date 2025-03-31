@@ -26,39 +26,36 @@ endif()
 function(download_libtorch)
     cmake_parse_arguments(
         DL_TORCH
-        "URL"    
         "CLEAR_CACHE"
         "CACHE_DIR"
         "DESTINATION"
-        ${ARGN}
+        ${ARGV}
     )
-    if(DL_TORCH_URL) 
-        set(TORCH_DISTRIBUTION "${DL_TORCH_URL}")
-    endif()
+
+    cmake_print_variables(DL_TORCH_CLEAR_CACHE)
+    cmake_print_variables(DL_TORCH_CACHE_DIR)
+    cmake_print_variables(DL_TORCH_DESTINATION)
+
 
 
     if(DL_TORCH_CACHE_DIR)
-        set(TORCH_CACHE_DIR "${DL_TORCH_CACHE_DIR}")
+        set(TORCH_CACHE_DIR ${DL_TORCH_CACHE_DIR})
     else()
         set(TORCH_CACHE_DIR "${CMAKE_SOURCE_DIR}/.cache")
     endif()
 
     set(TORCH_CACHE_NAME "libtorch_cache.zip")
     set(TORCH_CACHE "${TORCH_CACHE_DIR}/${TORCH_CACHE_NAME}")
-    set(TORCH_DIR "${TORCH_CACHE_DIR}/libtorch")
+    # set(TORCH_DIR "${TORCH_CACHE_DIR}/libtorch")
 
 
-    # if(DL_TORCH_DESTINATION)
-    #     set(TORCH_DESTINATION_DIR "${DL_TORCH_DESTINATION}")
-    # else()
-    #     set(TORCH_DESTINATION_DIR "${CMAKE_SOURCE_DIR}")
-    # endif()
+    if(DL_TORCH_DESTINATION)
+        set(TORCH_DIR ${DL_TORCH_DESTINATION})
+    else()
+        set(TORCH_DIR "${TORCH_CACHE_DIR}/torchlib")
+    endif()
     
-    # set(TORCH_DIR "${TORCH_DESTINATION_DIR}/libtorch")
-
-
-
-    if(EXISTS TORCH_CACHE)
+    if(EXISTS ${TORCH_CACHE})
         if(DL_TORCH_CLEAR_CACHE)
             message(STATUS "Clearing cache: ${TORCH_CACHE}")
             file(REMOVE "${TORCH_CACHE}")
@@ -74,7 +71,6 @@ function(download_libtorch)
         file(MAKE_DIRECTORY "${TORCH_CACHE_DIR}")
     endif()
 
-
     if(SHOULD_DOWNLOAD)
         message(STATUS "Downloading from ${TORCH_DISTRIBUTION}")
         file(DOWNLOAD "${TORCH_DISTRIBUTION}" "${TORCH_CACHE}" STATUS dlstatus)
@@ -84,17 +80,29 @@ function(download_libtorch)
         endif()
         message(STATUS "Downloaded ${TORCH_DISTRIBUTION} to ${TORCH_CACHE}")
 
-        if(EXISTS "${TORCH_DIR}")
+        if(EXISTS ${TORCH_DIR})
             message(STATUS "Removing existing directory: ${TORCH_DIR}")
             file(REMOVE_RECURSE "${TORCH_DIR}")
+            file(MAKE_DIRECTORY "${TORCH_DIR}")
         endif()
         message(STATUS "Unpacking ${TORCH_CACHE} to ${TORCH_DIR}")
 
-        file(ARCHIVE_EXTRACT 
-            INPUT ${TORCH_CACHE}
-            DESTINATION ${TORCH_DIR}
-            )
+        cmake_print_variables(TORCH_DIR)
 
+        file(MAKE_DIRECTORY "${TORCH_CACHE_DIR}/tmp")
+        file(ARCHIVE_EXTRACT 
+                INPUT ${TORCH_CACHE} 
+                DESTINATION "${TORCH_CACHE_DIR}/tmp"
+        )
+        file(RENAME "${TORCH_CACHE_DIR}/tmp/libtorch" "${TORCH_DIR}")
+
+        if(NOT EXISTS "${TORCH_CACHE_DIR}/tmp")
+            message(FATAL_ERROR "Failed to extract ${TORCH_CACHE} to ${TORCH_DIR}")
+        else()
+            message(STATUS "Extracted ${TORCH_CACHE} to ${TORCH_DIR}")
+            file(REMOVE_RECURSE "${TORCH_CACHE_DIR}/tmp")
+        endif()
+        
     endif()
 
 endfunction()

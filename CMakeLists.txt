@@ -13,11 +13,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(PROJECT_BINARY_DIR ${CMAKE_BINARY_DIR})
-set(PROJECT_SOURCE_DIR ${PROJECT_ROOT_DIR}/src)
-set(PROJECT_LIBRARY_DIR ${PROJECT_ROOT_DIR}/lib)
-set(PROJECT_INCLUDE_DIR ${PROJECT_ROOT_DIR}/include)
+set(PROJECT_CACHE_DIR "${PROJECT_ROOT_DIR}/.cache")
+set(PROJECT_SOURCE_DIR "${PROJECT_ROOT_DIR}/src")
+set(PROJECT_LIBRARY_DIR "${PROJECT_ROOT_DIR}/lib")
+set(PROJECT_INCLUDE_DIR "${PROJECT_ROOT_DIR}/include")
 
-set(PROJECT_CMAKE_MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(PROJECT_CMAKE_MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 cmake_print_variables(PROJECT_ROOT_DIR)
 cmake_print_variables(PROJECT_BINARY_DIR)
@@ -32,7 +33,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chapel")
 
 include(dlcache)
 include(LibTorchDL)
-download_libtorch()
 find_package(chpl REQUIRED HINTS ${CMAKE_MODULE_PATH})
 
 project(torchtest LANGUAGES CXX C CHPL)
@@ -71,14 +71,13 @@ add_executable(Milk src/Milk.chpl)
 
 
 
+download_libtorch(
+    CACHE_DIR ${PROJECT_CACHE_DIR}
+    DESTINATION "${PROJECT_ROOT_DIR}/libtorch"
+)
 
-# if(APPLE)
-#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-macos-arm64-latest.zip")
-# endif()
 
-# if(LINUX)
-#     set(TORCH_DISTRIBUTION "https://download.pytorch.org/libtorch/nightly/cpu/libtorch-cxx11-abi-static-with-deps-latest.zip")
-# endif()
+set(TORCH_DISTRIBUTION "${PROJECT_ROOT_DIR}/.cache/libtorch_cache.zip")
 
 include(FetchContent)
 FetchContent_Declare(
