@@ -1,36 +1,51 @@
 cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
-include(CMakePrintHelpers)
 
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 17)
 
+
 set(PROJECT_ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(PROJECT_BINARY_DIR ${CMAKE_BINARY_DIR})
 
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chapel")
+
+include(dlcache)
+include(CMakePrintHelpers)
+find_package(chpl REQUIRED HINTS ${CMAKE_MODULE_PATH})
+
+
+
 cmake_print_variables(PROJECT_ROOT_DIR)
 cmake_print_variables(PROJECT_BINARY_DIR)
+cmake_print_variables(PROJECT_SOURCE_DIR)
+# find_package(chpl REQUIRED HINTS ${PROJECT_ROOT_DIR}/cmake/chapel)
 
 
-
-
-
-
-# list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/chapel)
-
-find_package(chpl REQUIRED HINTS ${CMAKE_SOURCE_DIR}/cmake/chapel)
-project(hello LANGUAGES CHPL)
-
-add_executable(hello hello.chpl)
-
-project(torchtest)
-
-
+project(torchtest LANGUAGES CXX C CHPL)
 
 set(PROJECT_SOURCE_DIR ${PROJECT_ROOT_DIR}/src)
 set(PROJECT_LIBRARY_DIR ${PROJECT_ROOT_DIR}/lib)
 set(PROJECT_INCLUDE_DIR ${PROJECT_ROOT_DIR}/include)
+
+
+add_executable(Milk src/Milk.chpl)
+# target_include_directories(Milk PRIVATE ${PROJECT_INCLUDE_DIR})
+# target_link_libraries(Aloha PRIVATE mylib)
+
+
+
+
+# find_package(chpl REQUIRED HINTS ${PROJECT_ROOT_DIR}/cmake/chapel)
+# # project(hello)
+# add_executable(hello hello.chpl)
+
+
+
+
 
 
 
@@ -89,7 +104,7 @@ cmake_print_variables(TORCH_INCLUDE_DIRS)
 cmake_print_variables(TORCH_LIBRARIES)
 cmake_print_variables(TORCH_CXX_FLAGS)
 
-find_library(TORCH_LIBRARIES NAMES torch PATHS ${libtorch_SOURCE_DIR}/lib)
+# find_library(TORCH_LIBRARIES NAMES torch PATHS ${libtorch_SOURCE_DIR}/lib)
 
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/main.cpp)
@@ -155,7 +170,7 @@ install(
 
 cmake_print_variables(PROJECT_BINARY_DIR)
 
-add_library(mylib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
+add_library(mylib OBJECT ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
 
 file(GLOB_RECURSE CXX_SOURCE_FILES "${PROJECT_LIBRARY_DIR}/*.{c,cpp}")
 file(GLOB_RECURSE CXX_HEADER_FILES "${PROJECT_INCLUDE_DIR}/*.{h,hpp}")
@@ -175,20 +190,28 @@ add_custom_command(
         ${CHPL_SOURCE_FILES}
         ${PROJECT_BINARY_DIR}
     )
-add_custom_command(
-    TARGET mylib
-    POST_BUILD
+
+add_custom_target(
+    copy_include_header_files
+    ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_INCLUDE_DIR}
         ${PROJECT_BINARY_DIR}
-    )
-add_custom_command(
-    TARGET mylib
-    POST_BUILD
+    COMMENT "Copying include files to binary directory"
+)
+
+add_custom_target(
+    copy_chapel_src_files
+    ALL
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CHPL_SOURCE_FILES}
         ${PROJECT_BINARY_DIR}
-    )
+    COMMENT "Copying Chapel files to binary directory"
+)
+
+# add_executable(Aloha ${PROJECT_SOURCE_DIR}/hello.chpl)
+# target_include_directories(Aloha PRIVATE ${PROJECT_INCLUDE_DIR})
+# target_link_libraries(Aloha PRIVATE mylib)
 
 
 
