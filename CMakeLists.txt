@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 set(PROJECT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(PROJECT_BINARY_DIR ${CMAKE_BINARY_DIR})
+set(PROJECT_BINARY_DIR "${CMAKE_BINARY_DIR}")
 set(PROJECT_CACHE_DIR "${PROJECT_ROOT_DIR}/.cache")
 set(PROJECT_SOURCE_DIR "${PROJECT_ROOT_DIR}/src")
 set(PROJECT_LIBRARY_DIR "${PROJECT_ROOT_DIR}/lib")
@@ -27,15 +27,17 @@ cmake_print_variables(PROJECT_LIBRARY_DIR)
 cmake_print_variables(PROJECT_INCLUDE_DIR)
 
 
+# find_package(chpl REQUIRED HINTS "${PROJECT_ROOT_DIR}/cmake/chapel")
+find_package(chpl REQUIRED HINTS ${PROJECT_ROOT_DIR}/cmake/chapel)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/chapel")
-
-include(dlcache)
-find_package(chpl REQUIRED HINTS ${CMAKE_MODULE_PATH})
-
-
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_ROOT_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_ROOT_DIR}/cmake/chapel")
 project(torchtest LANGUAGES CXX C CHPL)
+
+include(GNUInstallDirs)
+include(dlcache)
+
+
 
 
 set(LIBTORCH_DIR ${PROJECT_ROOT_DIR}/libtorch)
@@ -61,13 +63,106 @@ target_link_libraries(Tester ${TORCH_LIBRARIES})
 
 add_executable(Milk src/Milk.chpl)
 
-# add_library(libtorch STATIC IMPORTED)
-# # set_target_properties(libtorch PROPERTIES IMPORTED_LOCATION "${LIBTORCH_LIBRARY_DIR}/libtorch.dylib")
-# target_link_libraries(libtorch INTERFACE ${TORCH_LIBRARIES})
-# target_include_directories(libtorch INTERFACE ${LIBTORCH_INCLUDE_DIR})
-
 add_executable(Tester2 src/tester.cpp)
 target_link_libraries(Tester2 torch)
+
+# ${PROJECT_BINARY_DIR}/mylib.h ${PROJECT_LIBRARY_DIR}/mylib.o
+
+include_directories(${PROJECT_INCLUDE_DIR})
+
+add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
+# install(TARGETS MyLib EXPORT ${PROJECT_BINARY_DIR})
+# install(FILES ${PROJECT_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
+
+
+# include_directories(${PROJECT_BINARY_DIR})
+
+
+
+
+add_executable(MyLibTest src/MyLibTest.chpl)
+target_link_options(MyLibTest PRIVATE --ccflags -O1) #  "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib")
+
+install(TARGETS MyLibTest DESTINATION .)
+
+# target_sources(MyLibTest ${PROJECT_INCLUDE_DIR}/mylib.h)
+
+# target_include_directories(MyLibTest PUBLIC ${PROJECT_INCLUDE_DIR} ${PROJECT_BINARY_DIR})
+# target_link_libraries(MyLibTest ${PROJECT_INCLUDE_DIR}/mylib.h ${PROJECT_BINARY_DIR}/libMyLib.a)
+# list(APPEND flags "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib")
+# target_compile_options(MyLibTest PUBLIC ${flags})
+# # target_link_libraries(MyLibTest MyLib)
+
+
+file(GLOB_RECURSE CXX_SOURCE_FILES "${PROJECT_LIBRARY_DIR}/*.{c,cpp}")
+file(GLOB_RECURSE CXX_HEADER_FILES "${PROJECT_INCLUDE_DIR}/*.{h,hpp}")
+file(GLOB_RECURSE CHPL_SOURCE_FILES "${PROJECT_SOURCE_DIR}/*.chpl")
+
+add_custom_command(
+    TARGET MyLib PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+        ${PROJECT_INCLUDE_DIR}
+        ${PROJECT_BINARY_DIR}
+)
+add_custom_command(
+    TARGET MyLibTest PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+        ${CHPL_SOURCE_FILES}
+        ${PROJECT_BINARY_DIR}
+)
+
+
+
+
+
+if(FALSE)
+add_custom_target(
+    copy_include_header_files
+    ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_INCLUDE_DIR}
+        ${PROJECT_BINARY_DIR}
+    COMMENT "Copying include files to binary directory"
+)
+
+add_custom_target(
+    copy_chapel_src_files
+    ALL
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CHPL_SOURCE_FILES}
+        ${PROJECT_BINARY_DIR}
+    COMMENT "Copying Chapel files to binary directory"
+)
+endif()
+
+
+
+if(FALSE)
+file(GLOB_RECURSE TORCH_BRIDGE_TARGETS "${PROJECT_LIBRARY_DIR}/*.cpp")
+file(GLOB_RECURSE TORCH_BRIDGE_INCLUDES "${PROJECT_INCLUDE_DIR}/*.h")
+
+include_directories(${PROJECT_INCLUDE_DIR})
+include_directories(${PROJECT_LIBRARY_DIR})
+
+add_library(torchbridge STATIC ${TORCH_BRIDGE_TARGETS})
+target_sources(torchbridge PUBLIC ${TORCH_BRIDGE_INCLUDES})
+
+add_library(mylib OBJECT ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
+
+
+add_custom_command(
+    TARGET torchbridge
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_INCLUDE_DIR}
+)
+endif()
+
+
+
+
 
 # target_include_directories(Milk PRIVATE ${PROJECT_INCLUDE_DIR})
 # target_link_libraries(Aloha PRIVATE mylib)

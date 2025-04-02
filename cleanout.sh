@@ -8,5 +8,5 @@ cd build
 cmake ..
 cmake --build . --parallel 4 --target install;
 
-make -j4
+make -j5
 
