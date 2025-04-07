@@ -72,7 +72,6 @@ target_link_libraries(Tester2 torch)
 
 include_directories(${PROJECT_INCLUDE_DIR})
 
-add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
 
 
 # install(TARGETS MyLib EXPORT ${PROJECT_BINARY_DIR})
@@ -85,9 +84,22 @@ add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/m
 
 
 
+add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
 
 add_executable(MyLibTest src/MyLibTest.chpl)
 target_link_options(MyLibTest PRIVATE mylib.h -L. "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib")
+
+
+
+
+
+add_library(MyLib2 STATIC ${PROJECT_LIBRARY_DIR}/mylib2.cpp ${PROJECT_INCLUDE_DIR}/mylib2.h)
+
+add_executable(MyLibTestXX src/MyLibTest.chpl)
+target_link_options(MyLibTestXX PRIVATE mylib2.h -L. "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib2")
+
+
+
 
 # install(TARGETS MyLibTest DESTINATION .)
 
