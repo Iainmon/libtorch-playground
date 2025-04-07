@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
 
 include(CMakePrintHelpers)
 
+# set(CMAKE_VERBOSE_MAKEFILE ON)
+
 if(UNIX AND NOT APPLE)
     set(LINUX TRUE)
 endif()
@@ -71,6 +73,8 @@ target_link_libraries(Tester2 torch)
 include_directories(${PROJECT_INCLUDE_DIR})
 
 add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/mylib.h)
+
+
 # install(TARGETS MyLib EXPORT ${PROJECT_BINARY_DIR})
 # install(FILES ${PROJECT_INCLUDES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
@@ -83,9 +87,9 @@ add_library(MyLib STATIC ${PROJECT_LIBRARY_DIR}/mylib.c ${PROJECT_INCLUDE_DIR}/m
 
 
 add_executable(MyLibTest src/MyLibTest.chpl)
-target_link_options(MyLibTest PRIVATE --ccflags -O1) #  "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib")
+target_link_options(MyLibTest PRIVATE mylib.h -L. "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib")
 
-install(TARGETS MyLibTest DESTINATION .)
+# install(TARGETS MyLibTest DESTINATION .)
 
 # target_sources(MyLibTest ${PROJECT_INCLUDE_DIR}/mylib.h)
 
