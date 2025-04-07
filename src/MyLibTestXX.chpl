@@ -34,7 +34,7 @@ proc getSizeArray(const ref arr: [] ?eltType): [] int(32) {
     return sizes;
 }
 
-proc getArrayShapeC(const ref arr: [] ?eltType): arrayShape_c {
+proc getArrayShapeC(const ref arr: [] ?eltType): arrayShape_c(arr.rank) {
     var shape: arrayShape_c(arr.rank);
     for i in 0..<arr.rank do
         shape.sizes[i] = arr.dim(i).size : int(32);

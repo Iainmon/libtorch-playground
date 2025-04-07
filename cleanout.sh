@@ -6,12 +6,15 @@ rm -rf build
 mkdir -p build
 cd build
 cmake ..
-cmake --build . --parallel 4 --target install;
 
+cmake --build . --parallel 5 --target install;
 make -j5
 
-./MyLibTestXX || echo 1
-./TorchBridgeCHPL || echo 1
+./MyLibTestXX > /dev/null || echo 1
+
+echo "Running TorchBridgeCHPL"
+
+./TorchBridgeCHPL && echo "Success!"
 
 cd ..
 
