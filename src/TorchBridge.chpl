@@ -1,6 +1,7 @@
 
 // require "mylib.h", "-lMyLib";
 
+extern proc baz(): int;
 extern proc wrHello(): void;
 extern proc wrHelloTorch(): void;
 extern proc sumArray(arr: [] real(32), sizes: [] int(32), dim: int(32)): real(32);
@@ -8,6 +9,8 @@ extern proc sumArray(arr: [] real(32), sizes: [] int(32), dim: int(32)): real(32
 wrHello();
 
 wrHelloTorch();
+
+writeln("baz: ", baz());
 
 
 var dom = {0..<10, 0..<10};

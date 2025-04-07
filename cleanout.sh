@@ -11,6 +11,7 @@ cmake --build . --parallel 4 --target install;
 make -j5
 
 ./MyLibTestXX || echo 1
+./TorchBridgeCHPL || echo 1
 
 cd ..
 
