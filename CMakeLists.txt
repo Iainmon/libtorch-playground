@@ -112,21 +112,33 @@ target_link_options(MyLibTestXX
 # target_link_options(MyLibTestXX PRIVATE mylib2.h -L. "-lMyLib2" "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-I${LIBTORCH_INCLUDE_DIR}" "-L${LIBTORCH_LIBRARY_DIR}")
 
 
-add_library(torchbridge SHARED ${PROJECT_LIBRARY_DIR}/bridge.cpp ${PROJECT_INCLUDE_DIR}/bridge.h ${LIBTORCH_INCLUDE_DIR} ${LIBTORCH_LIBRARY_DIR})
+add_library(torchbridge 
+    SHARED 
+        ${PROJECT_LIBRARY_DIR}/bridge.cpp 
+        ${PROJECT_INCLUDE_DIR}/bridge.h 
+        ${LIBTORCH_INCLUDE_DIR} 
+        ${LIBTORCH_LIBRARY_DIR}
+        ${LIBTORCH_LIBRARIES}
+        ${LIBTORCH_INCLUDES}
+    )
 target_link_libraries(torchbridge torch)
 
 add_executable(TorchBridgeCHPL src/TorchBridge.chpl)
 target_link_options(TorchBridgeCHPL 
     PRIVATE 
-        bridge.h 
-        "-L${PROJECT_BINARY_DIR}" 
-        -L.
+        "${PROJECT_BINARY_DIR}/bridge.h"
+        "-L${PROJECT_BINARY_DIR}"
+
+        # -L.
         "-ltorchbridge" 
-        "-I${PROJECT_INCLUDE_DIR}" 
-        "-I${PROJECT_BINARY_DIR}" 
-        "-I${LIBTORCH_INCLUDE_DIR}" 
-        "-L${LIBTORCH_LIBRARY_DIR}"
-        --ldflags "-Wl,-rpath,@executable_path")
+
+        # "-L${PROJECT_BINARY_DIR}" 
+        # "-I${PROJECT_INCLUDE_DIR}" 
+        # "-I${PROJECT_BINARY_DIR}" 
+        # "-I${LIBTORCH_INCLUDE_DIR}" 
+        # "-L${LIBTORCH_LIBRARY_DIR}"
+        --ldflags "-Wl,-rpath,@executable_path"
+    )
 
 
 
