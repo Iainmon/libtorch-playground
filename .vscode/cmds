@@ -19,7 +19,7 @@
 },
 {
   "directory": "/Users/iainmoncrief/Documents/Github/libtorch-playground/.vscode/build",
-  "command": "/usr/bin/clang++  -I/Users/iainmoncrief/Documents/Github/libtorch-playground/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/MyLib2.dir/lib/mylib2.cpp.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/lib/mylib2.cpp",
+  "command": "/usr/bin/clang++ -DMyLib2_EXPORTS -DUSE_C10D_GLOO -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -I/Users/iainmoncrief/Documents/Github/libtorch-playground/include -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/libtorch/include -isystem /Users/iainmoncrief/Documents/Github/libtorch-playground/libtorch/include/torch/csrc/api/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -o CMakeFiles/MyLib2.dir/lib/mylib2.cpp.o -c /Users/iainmoncrief/Documents/Github/libtorch-playground/lib/mylib2.cpp",
   "file": "/Users/iainmoncrief/Documents/Github/libtorch-playground/lib/mylib2.cpp",
   "output": "CMakeFiles/MyLib2.dir/lib/mylib2.cpp.o"
 }

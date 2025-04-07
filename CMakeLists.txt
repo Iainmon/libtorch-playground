@@ -93,10 +93,23 @@ target_link_options(MyLibTest PRIVATE mylib.h -L. "-L${PROJECT_BINARY_DIR}" "-I$
 
 
 
-add_library(MyLib2 STATIC ${PROJECT_LIBRARY_DIR}/mylib2.cpp ${PROJECT_INCLUDE_DIR}/mylib2.h)
+add_library(MyLib2 SHARED ${PROJECT_LIBRARY_DIR}/mylib2.cpp ${PROJECT_INCLUDE_DIR}/mylib2.h ${LIBTORCH_INCLUDE_DIR} ${LIBTORCH_LIBRARY_DIR})
+target_link_libraries(MyLib2 torch)
 
 add_executable(MyLibTestXX src/MyLibTest.chpl)
-target_link_options(MyLibTestXX PRIVATE mylib2.h -L. "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-lMyLib2")
+target_link_options(MyLibTestXX 
+    PRIVATE 
+        mylib2.h 
+        "-L${PROJECT_BINARY_DIR}" 
+        -L.
+        "-lMyLib2" 
+        "-I${PROJECT_INCLUDE_DIR}" 
+        "-I${PROJECT_BINARY_DIR}" 
+        "-I${LIBTORCH_INCLUDE_DIR}" 
+        "-L${LIBTORCH_LIBRARY_DIR}"
+        --ldflags "-Wl,-rpath,@executable_path")
+
+# target_link_options(MyLibTestXX PRIVATE mylib2.h -L. "-lMyLib2" "-L${PROJECT_BINARY_DIR}" "-I${PROJECT_INCLUDE_DIR}" "-I${PROJECT_BINARY_DIR}" "-I${LIBTORCH_INCLUDE_DIR}" "-L${LIBTORCH_LIBRARY_DIR}")
 
 
 

@@ -3,10 +3,15 @@
 #include <stdio.h>
 
 #ifdef __cplusplus
+#include <torch/torch.h>
+#include <iostream>
 extern "C" {
 #endif
 
+
 void wrHello(void);
+
+void wrHelloTorch(void);
 
 #ifdef __cplusplus
 }
